@@ -1,24 +1,29 @@
 <script>
 	import { T, useTask } from '@threlte/core';
-	import { useTexture } from '@threlte/extras';
+	import { Billboard, Stars, useTexture } from '@threlte/extras';
 	import { interactivity } from '@threlte/extras';
 	import { spring } from 'svelte/motion';
 
 	interactivity();
 	const scale = spring(1);
 	let rotation = 0;
+	//	useTask((delta) => {
+	//		rotation += delta;
+	//	});
+
+	let splash_z = 0;
 	useTask((delta) => {
-		rotation += delta;
-	});
+		splash_z += delta
+	})
 
 	const texture = useTexture('/splash.png');
 </script>
 
 <T.PerspectiveCamera
 	makeDefault
-	position={[10, 10, 10]}
+	position={[0, 0, 10]}
 	on:create={({ ref }) => {
-		ref.lookAt(0, 1, 0);
+		ref.lookAt(0, 0, 0);
 	}}
 />
 
@@ -36,8 +41,13 @@
 </T.Mesh>
 
 {#await texture then value}
-	<T.Mesh rotation.y={1}>
-		<T.PlaneGeometry args={[5, 5]} />
-		<T.MeshBasicMaterial map={value} />
-	</T.Mesh>
+	<Billboard>
+		<T.Mesh position={[0, 0, 0]} position.z={splash_z}>
+			<T.MeshBasicMaterial map={value} alphaTest={0.5} transparent />
+			<T.PlaneGeometry args={[7, 7]} />
+		</T.Mesh>
+	</Billboard>
 {/await}
+
+
+<Stars />
